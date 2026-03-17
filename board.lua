@@ -112,7 +112,9 @@ end
 Board.showBoard = function()
 	for row = 1, ROWS do
 		for col = 1, COLS do
-			io.write(Board.board[row][col] .. ", ")
+			local p = Board.board[row][col]
+			-- CORREÇÃO: Verifica se é objeto para imprimir o player, senão imprime 0
+			io.write((type(p) == "table" and p.player or p) .. ", ")
 		end
 		print()
 	end
@@ -159,8 +161,7 @@ Board.getAllPossibleCaptures = function()
 	for r = 1, ROWS do
 		for c = 1, COLS do
 			local piece = Board.getPiece(r, c)
-			if piece == Board.currentPlayer then
-				-- CORREÇÃO: Nome da função era getValidMoves
+			if piece ~= 0 and piece.player == Board.currentPlayer then
 				local moves = Board.getValidMoves(r, c, true)
 				local hasCapture = false
 				for _, m in ipairs(moves) do
@@ -187,10 +188,11 @@ Board.getValidMoves = function(row, col, onlyCaptures)
 
 	local captureMoves = {}
 	local normalMoves = {}
-	local dirs = { { 1, 1 }, { 1, -1 }, { -1, 1 }, { -1, -1 } }
 
+	local dirs = piece:getDirections()
+
+	-- 1. Checa as capturas nas direções permitidas
 	for _, dir in ipairs(dirs) do
-		-- 1. Capturas (Salto de 2)
 		local r2, c2 = row + (dir[1] * 2), col + (dir[2] * 2)
 		if r2 >= 1 and r2 <= ROWS and c2 >= 1 and c2 <= COLS then
 			local isCap, _, _ = Board.canCapture(row, col, r2, c2)
@@ -198,22 +200,25 @@ Board.getValidMoves = function(row, col, onlyCaptures)
 				table.insert(captureMoves, { row = r2, col = c2, isCapture = true })
 			end
 		end
+	end
 
-		-- 2. Normais (Apenas se não estivermos forçando só capturas)
-		if not onlyCaptures then
-			local r1, c1 = row + dir[1], col + dir[2]
-			if r1 >= 1 and r1 <= ROWS and c1 >= 1 and c1 <= COLS then
-				if Board.getPiece(r1, c1) == 0 then
-					table.insert(normalMoves, { row = r1, col = c1, isCapture = false })
-				end
+	if #captureMoves > 0 then
+		return captureMoves
+	end
+	if onlyCaptures then
+		return {}
+	end
+
+	-- 2. Checa os movimentos normais nas direções permitidas
+	for _, dir in ipairs(dirs) do
+		local r1, c1 = row + dir[1], col + dir[2]
+		if r1 >= 1 and r1 <= ROWS and c1 >= 1 and c1 <= COLS then
+			if Board.getPiece(r1, c1) == 0 then
+				table.insert(normalMoves, { row = r1, col = c1, isCapture = false })
 			end
 		end
 	end
 
-	-- Se houver capturas para ESTA peça, retorna apenas elas
-	if #captureMoves > 0 then
-		return captureMoves
-	end
 	return normalMoves
 end
 

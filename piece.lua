@@ -3,29 +3,36 @@ Piece.__index = Piece
 
 function Piece.new(player, row, col)
   local self = setmetatable({}, Piece)
-  self.player = player -- 1 ou 2
+  self.player = player
   self.row = row
   self.col = col
-  self.isKing = false -- Começa como peça normal
+  self.isKing = false
   return self
 end
 
--- Retorna as direções que a peça pode se mover
 function Piece:getDirections()
+  -- h: sempre move para esquerda (-1) e direita (1)
+  local h = { 1, -1 }
+
+  -- v: define se vai para baixo (1) ou para cima (-1)
+  local v = { self.player == 1 and 1 or -1 }
+
+  -- Se for Dama, libera o eixo V para os dois lados
   if self.isKing then
-    -- Damas movem em todas as 4 direções
-    return { { 1, 1 }, { 1, -1 }, { -1, 1 }, { -1, -1 } }
+    v = { 1, -1 }
   end
 
-  -- Peças normais respeitam a direção do jogador
-  if self.player == 1 then
-    return { { 1, 1 }, { 1, -1 } } -- Desce
-  else
-    return { { -1, 1 }, { -1, -1 } } -- Sobe
+  -- Monta a lista final combinando V e H para o board.lua usar
+  local dirs = {}
+  for _, dv in ipairs(v) do
+    for _, dh in ipairs(h) do
+      table.insert(dirs, { dv, dh })
+    end
   end
+
+  return dirs
 end
 
--- Método para promover a peça
 function Piece:promote()
   self.isKing = true
   print("Peça promovida a Dama!")
