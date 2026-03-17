@@ -1,13 +1,17 @@
+require("config")
 require("board")
 require("piece")
 
 local selectedPiece = nil
 local mandatoryPieces = {}
 local multiCapturePiece = nil -- CORREÇÃO: Nome unificado (antes estava multiCapture)
-local validMoves = {}         -- Certifique-se que esta variável existe no escopo
+local validMoves = {} -- Certifique-se que esta variável existe no escopo
 
 function love.load()
 	love.window.setTitle("CheckersLua")
+	love.window.setMode(SCREEN_SIZE, SCREEN_SIZE)
+	Piece.loadAssets()
+
 	Board.restart()
 	Board.showBoard()
 end

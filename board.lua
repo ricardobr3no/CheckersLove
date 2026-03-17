@@ -125,22 +125,12 @@ Board.drawPieces = function()
 		for col = 1, COLS do
 			local piece = Board.getPiece(row, col)
 			if piece ~= 0 then
-				-- CORREÇÃO: Acessar .player
-				if piece.player == 1 then
-					love.graphics.setColor(1, 0, 0)
-				else
-					love.graphics.setColor(1, 1, 1)
-				end
-
+				-- Calcula onde é o meio do quadrado
 				local centerX = (col - 1) * SQUARE_SIZE + SQUARE_SIZE / 2
 				local centerY = (row - 1) * SQUARE_SIZE + SQUARE_SIZE / 2
-				love.graphics.circle("fill", centerX, centerY, SQUARE_SIZE * 0.4)
 
-				if piece.isKing then
-					love.graphics.setColor(1, 0.8, 0)
-					love.graphics.setLineWidth(3)
-					love.graphics.circle("line", centerX, centerY, SQUARE_SIZE * 0.25)
-				end
+				-- Manda a peça desenhar-se a si mesma!
+				piece:draw(centerX, centerY, SQUARE_SIZE)
 			end
 		end
 	end
