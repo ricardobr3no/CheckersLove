@@ -80,23 +80,6 @@ Board.movePiece = function(oldRow, oldCol, newRow, newCol)
 	return isCapture
 end
 
-Board.checkIsGameOver = function()
-	local countP1, countP2 = 0, 0
-	for row = 1, ROWS do
-		for col = 1, COLS do
-			local val = Board.board[row][col]
-			if val == 1 then
-				countP1 = countP1 + 1
-			elseif val == 2 then
-				countP2 = countP2 + 1
-			end
-		end
-	end
-	if countP1 == 0 or countP2 == 0 then
-		print("GameOver")
-	end
-end
-
 -- CORREÇÃO: Proteção para não dar erro de 'index nil'
 Board.getPiece = function(row, col)
 	if Board.board[row] then
@@ -210,6 +193,34 @@ Board.getValidMoves = function(row, col, onlyCaptures)
 	end
 
 	return normalMoves
+end
+
+function Board.checkWinner()
+	local countCurrentPlayerPieces = 0
+	local currentPlayerHasMoves = false
+
+	for row = 1, ROWS do
+		for col = 1, COLS do
+			local piece = Board.getPiece(row, col)
+			-- verificar as pecas do jogador atual
+			if piece ~= 0 and piece.player == Board.currentPlayer then
+				countCurrentPlayerPieces = countCurrentPlayerPieces + 1
+				-- se ele tiver ao menos UM movimento valido ainda esta no jogo
+				local validMoves = Board.getValidMoves(row, col, false)
+				if #validMoves > 0 then
+					currentPlayerHasMoves = true
+				end
+			end
+		end
+	end
+
+	-- se o jogador atual nao tem pecas ou movimentos, o OUTRO jogador vence
+	if countCurrentPlayerPieces == 0 or not currentPlayerHasMoves then
+		-- returna numero do ganhador
+		return Board.currentPlayer == 1 and 2 or 1
+	end
+
+	return nil -- continua o jogo
 end
 
 return Board

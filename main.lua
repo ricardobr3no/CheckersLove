@@ -5,7 +5,8 @@ require("piece")
 local selectedPiece = nil
 local mandatoryPieces = {}
 local multiCapturePiece = nil -- CORREÇÃO: Nome unificado (antes estava multiCapture)
-local validMoves = {} -- Certifique-se que esta variável existe no escopo
+local validMoves = {}         -- Certifique-se que esta variável existe no escopo
+local winner = nil            -- numero de ganhador
 
 function love.load()
 	love.window.setTitle("CheckersLua")
@@ -95,13 +96,15 @@ function love.mousepressed(x, y, button)
 					validMoves = {}
 					mandatoryPieces = {}
 					Board.changeTurn()
+
+					winner = Board.checkWinner()
 				end
 			else
 				-- Se não clicou num movimento válido e não está em multicapture, permite trocar a peça
 				if not multiCapturePiece then
 					selectedPiece = nil
 					validMoves = {}
-					love.mousepressed(x, y, button)
+					love.mousepressed(x, y, button) -- recursao, quando mudar de posicao ja entra selecionado
 				end
 			end
 		end
@@ -115,6 +118,10 @@ function love.keypressed(key)
 	elseif key == "r" then
 		print("reiniciado")
 		Board.restart()
+		winner = nil
+		selectedPiece = nil
+		validMoves = {}
+		multiCapturePiece = nil
 	end
 end
 
@@ -161,5 +168,30 @@ function love.draw()
 				SQUARE_SIZE * 0.5
 			)
 		end
+	end
+
+	-- Tela de Fim de Jogo
+	if winner then
+		-- Fundo semi-transparente
+		love.graphics.setColor(0, 0, 0, 0.75)
+		love.graphics.rectangle("fill", 0, 0, love.graphics.getWidth(), love.graphics.getHeight())
+
+		-- Texto de Vitória
+		love.graphics.setColor(1, 1, 1)
+		local font = love.graphics.getFont()
+		local texto = "Jogador " .. winner .. " Venceu!"
+		local texto2 = "Pressione 'R' para reiniciar"
+
+		-- Centraliza o texto na tela
+		love.graphics.print(
+			texto,
+			love.graphics.getWidth() / 2 - font:getWidth(texto) / 2,
+			love.graphics.getHeight() / 2 - 20
+		)
+		love.graphics.print(
+			texto2,
+			love.graphics.getWidth() / 2 - font:getWidth(texto2) / 2,
+			love.graphics.getHeight() / 2 + 20
+		)
 	end
 end
