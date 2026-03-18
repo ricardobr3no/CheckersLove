@@ -1,4 +1,4 @@
-require("config")
+Config = require("config")
 require("board")
 require("piece")
 
@@ -10,7 +10,7 @@ local winner = nil            -- numero de ganhador
 
 function love.load()
 	love.window.setTitle("CheckersLua")
-	love.window.setMode(SCREEN_SIZE, SCREEN_SIZE)
+	love.window.setMode(Config.SCREEN_WIDTH, Config.SCREEN_HEIGHT)
 	Piece.loadAssets()
 
 	Board.restart()

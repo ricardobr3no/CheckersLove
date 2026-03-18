@@ -1,8 +1,8 @@
-require("config") -- Certifique-se que SCREEN_SIZE está definido lá
+Config = require("config") -- Certifique-se que SCREEN_SIZE está definido lá
 Piece = require("piece")
 
 ROWS, COLS = 8, 8
-SQUARE_SIZE = SCREEN_SIZE / 8
+SQUARE_SIZE = Config.BOARD_SIZE / 8
 
 local function createBoard()
 	local board = {}
